@@ -1,0 +1,11 @@
+Combinations checked: 65,536
+
+Red       9326   14.23%  ok
+Orange    9842   15.02%  ok
+Yellow    9135   13.94%  ok
+Pink      8984   13.71%  ok
+White     8908   13.59%  ok
+Green     9849   15.03%  ok
+Black     9492   14.48%  ok
+
+PASS: every colour should be roughly between 13.5% and 15% (±0.1).
