@@ -1,6 +1,6 @@
 # Navratri Colour Quiz
 
-A static, mobile-first personality quiz for Jazbaa X Ashoka Data Society. Plain HTML/CSS/JS: no build step, no backend, no tracking. Scoring runs entirely in the browser.
+A static, mobile-first personality quiz for ADS X Jazbaa (Ashoka Data Society and Jazbaa). Plain HTML/CSS/JS: no build step, no backend, no tracking. Scoring runs entirely in the browser.
 
 ## Run locally
 ```
@@ -31,3 +31,6 @@ node scripts/check-distribution.js
 ```
 It enumerates all 4⁸ = 65,536 answer combinations and each colour should land at roughly 13.5–15%. Last output is in `scripts/distribution-output.txt`.
 Note: Yellow/Pink tie exactly on ~1% of combinations; `scoring.js` compares with a small epsilon so the tie goes to the earlier colour (Yellow) reliably.
+
+## Society logos
+The "ADS X Jazbaa" lockup and the loading animation show round placeholder badges. To use the real logos, add square PNGs (transparent background works best) to `images/` and set the paths in `quiz-data.js` under `site.societies` (for example `logo: 'images/logo-ads.png'`).

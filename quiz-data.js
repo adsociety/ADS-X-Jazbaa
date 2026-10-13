@@ -15,7 +15,15 @@
     site: {
       title: "What's Your Navratri Colour?",
       hook: '8 questions. Zero overthinking. One outfit colour.',
-      credit: 'Jazbaa X Ashoka Data Society',
+      credit: 'ADS X Jazbaa',
+      // Society logos. Drop files in images/ and set the paths (e.g. 'images/logo-ads.png');
+      // while empty, a round placeholder badge is shown instead.
+      societies: [
+        { name: 'Ashoka Data Society', short: 'ADS', logo: 'images/ADSlogo.jpg' },
+        { name: 'Jazbaa', short: 'J', logo: '' },
+      ],
+      // big stacked type on the loading screen (one entry per row)
+      loaderRows: ['ASHOKA', 'DATA', 'SOCIETY', 'X', 'JAZBAA'],
       shareUrl: '', // leave empty to share the page's own URL
     },
 

@@ -40,10 +40,23 @@
     clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('show'); }, 2200);
   }
 
+  /* ---------- society logos ---------- */
+  function logoMark(soc) {
+    var w = el('span', { class: 'logo', 'aria-hidden': 'true' }, [el('span', { class: 'logo-ph', text: soc.short })]);
+    if (soc.logo) {
+      var img = el('img', { src: soc.logo, alt: '', decoding: 'async' });
+      img.addEventListener('load', function () { w.classList.add('has-img'); });
+      img.addEventListener('error', function () { img.remove(); }); // placeholder badge stays
+      w.appendChild(img);
+    }
+    return w;
+  }
+
   /* ---------- state ---------- */
   function reset() {
     clearTimers();
     answers = new Array(N).fill(null);
+    var ld = $('loader'); if (ld) { ld.hidden = true; ld.classList.remove('run', 'out'); }
     current = 0; locked = false; lastResult = null;
     document.body.classList.remove('themed');
     document.body.removeAttribute('data-theme');
@@ -62,17 +75,19 @@
     h1.appendChild(el('em', { text: 'Navratri Colour' }));
     h1.appendChild(document.createTextNode('?'));
     $('hook').textContent = D.site.hook;
-    $('credit').textContent = D.site.credit;
-    $('credit2').textContent = D.site.credit;
-    // desktop-only decorative ring of the seven colours
-    var art = $('landingArt');
-    D.colours.forEach(function (c, i) {
-      var d = el('span', { class: 'art-dot' });
-      d.style.background = c.theme.swatch;
-      d.style.transform = 'rotate(' + (i * 360 / D.colours.length) + 'deg) translateY(-150px)';
-      art.appendChild(d);
+    // ADS X Jazbaa lockup on every screen (placeholder badges until logos are supplied)
+    Array.prototype.forEach.call(document.querySelectorAll('.brand'), function (b) {
+      b.setAttribute('aria-label', D.site.societies.map(function (s) { return s.name; }).join(' and '));
+      b.appendChild(logoMark(D.site.societies[0]));
+      b.appendChild(el('span', { text: D.site.credit }));
+      b.appendChild(logoMark(D.site.societies[1]));
     });
-    art.appendChild(el('span', { class: 'art-core' }));
+    // landing garba circle: seven colours + a ring of tiny mirror dots
+    var orbit = $('gOrbit'), inner = $('gInner');
+    D.colours.forEach(function (c, i) {
+      var d = el('i'); d.style.background = c.theme.swatch; d.style.setProperty('--a', (i * 360 / D.colours.length) + 'deg'); orbit.appendChild(d);
+    });
+    for (var m = 0; m < 14; m++) { var t = el('i'); t.style.setProperty('--a', (m * 360 / 14) + 'deg'); inner.appendChild(t); }
     var p = $('progress');
     for (var i = 0; i < N; i++) p.appendChild(el('li'));
   }
@@ -81,7 +96,10 @@
   function renderQuestion() {
     var q = D.questions[current];
     locked = false;
-    $('qcount').textContent = 'Question ' + (current + 1) + ' of ' + N;
+    var qc = $('qcount'); qc.textContent = '';
+    qc.setAttribute('aria-label', 'Question ' + (current + 1) + ' of ' + N);
+    qc.appendChild(el('b', { text: String(current + 1) })); qc.appendChild(el('small', { text: 'of ' + N }));
+    qc.classList.remove('pop'); void qc.offsetWidth; qc.classList.add('pop');
     $('progress').setAttribute('aria-label', 'Question ' + (current + 1) + ' of ' + N);
     Array.prototype.forEach.call($('progress').children, function (li, i) {
       li.className = answers[i] !== null && i < current ? 'done' : (i === current ? 'now' : '');
@@ -89,7 +107,8 @@
     var qt = $('qtext'); qt.textContent = q.text;
     var box = $('answers'); box.textContent = '';
     q.options.forEach(function (o, i) {
-      var b = el('button', { type: 'button', class: 'answer slide-in', 'aria-pressed': answers[current] === i ? 'true' : 'false', text: o.text });
+      var b = el('button', { type: 'button', class: 'answer slide-in', 'aria-pressed': answers[current] === i ? 'true' : 'false' });
+      b.appendChild(el('span', { class: 'atext', text: o.text }));
       if (answers[current] === i) b.classList.add('selected');
       b.style.animationDelay = (i * 45) + 'ms';
       b.addEventListener('click', function () { choose(i, b); });
@@ -123,14 +142,78 @@
   }
 
   /* ---------- reveal ---------- */
+  function buildLoader() {
+    var rows = D.site.loaderRows, W = 400;
+    // [font size, text length, x, gradient] per row; lengthAdjust makes every row fill the width
+    var spec = [[150, 400, 0, 0], [220, 400, 0, 1], [138, 400, 0, 2], [150, 100, 150, 3], [150, 400, 0, 4]];
+    var y = 14, gap = 12, out = '';
+    rows.forEach(function (t, i) {
+      var sp = spec[i] || spec[0], cap = sp[0] * 0.86;
+      y += cap;
+      out += '<g class="row" style="--i:' + i + '"><text x="' + sp[2] + '" y="' + y + '" font-family="Anton, Impact, sans-serif" font-size="' + sp[0] +
+        '" textLength="' + sp[1] + '" lengthAdjust="spacingAndGlyphs" fill="url(#lg' + sp[3] + ')" stroke="#0B130B" stroke-width="1.6" paint-order="stroke">' + t + '</text></g>';
+      sp.y = y; y += gap;
+    });
+    var ghost = '';
+    rows.forEach(function (t, i) {
+      var sp = spec[i] || spec[0];
+      ghost += '<g class="row" style="--i:' + (i + 2) + '"><text x="' + sp[2] + '" y="' + sp.y + '" font-family="Anton, Impact, sans-serif" font-size="' + sp[0] +
+        '" textLength="' + sp[1] + '" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#F4F1E6" stroke-opacity=".3" stroke-width="1.6">' + t + '</text></g>';
+    });
+    var vb = '0 0 400 ' + Math.ceil(y);
+    var xRow = spec[3].y, r3 = spec[2].y;
+    function top(i) { return spec[i].y - spec[i][0] * 0.86; }
+    function grad(id, x1, y1, x2, y2, stops, dx) {
+      return '<linearGradient id="lg' + id + '" gradientUnits="userSpaceOnUse" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" spreadMethod="reflect">' +
+        stops.map(function (s, k) { return '<stop offset="' + (k / (stops.length - 1)) + '" stop-color="' + s + '"/>'; }).join('') +
+        '<animateTransform attributeName="gradientTransform" type="translate" values="0 0;' + dx + ' 0" dur="2.8s" repeatCount="indefinite"/></linearGradient>';
+    }
+    var defs = '<defs>' +
+      grad(0, 0, top(0), 400, spec[0].y, ['#00D1FF', '#0A5CFF', '#8CF7FF', '#0A5CFF'], -160) +
+      grad(1, 0, top(1), 400, spec[1].y, ['#FFE08A', '#FF9A3C', '#FF4F7B', '#7A3CFF'], 150) +
+      grad(2, 0, top(2), 400, spec[2].y, ['#6EE7FF', '#1CA7C9', '#F2FEFF', '#0EA5B7'], -170) +
+      grad(3, 150, top(3), 250, spec[3].y, ['#FFB3D9', '#FF7EB6', '#FFD1E8'], 60) +
+      grad(4, 0, top(4), 400, spec[4].y, ['#FF9A3C', '#FF4F7B', '#0A5CFF', '#00D1FF'], -150) + '</defs>';
+    var ink = '#0E1A0E', paper = '#F4F1E6', pink = '#FFB3D9';
+    function badge(cx, cy, r, inner) { return '<g class="badge" transform="translate(' + cx + ' ' + cy + ') scale(' + r / 36 + ')"><g class="spinner">' + inner + '</g></g>'; }
+    var planet = '<circle r="36" fill="' + ink + '" stroke="' + paper + '" stroke-width="3"/><ellipse rx="30" ry="11" transform="rotate(-24)" fill="none" stroke="' + paper + '" stroke-width="2"/>' +
+      '<circle r="11" fill="' + pink + '"/><circle cx="-27" cy="7" r="3.4" fill="' + paper + '"/><circle cx="26" cy="-12" r="3.4" fill="' + paper + '"/>';
+    var face = '<circle r="36" fill="' + pink + '" stroke="' + ink + '" stroke-width="3"/><circle cx="-11" cy="-5" r="3.8" fill="' + ink + '"/><circle cx="11" cy="-5" r="3.8" fill="' + ink + '"/>' +
+      '<path d="M-12 8 Q0 20 12 8" fill="none" stroke="' + ink + '" stroke-width="3.2" stroke-linecap="round"/>';
+    var reticle = '<circle r="36" fill="' + ink + '" stroke="' + paper + '" stroke-width="3"/><circle r="20" fill="none" stroke="' + paper + '" stroke-width="2"/>' +
+      '<path d="M-36 0H-8M8 0H36M0 -36V-8M0 8V36" stroke="' + paper + '" stroke-width="2"/><circle r="3" fill="' + pink + '"/>';
+    var badges = badge(70, xRow - 64, 38, reticle) + badge(330, xRow - 64, 38, face) + badge(364, r3 - 104, 28, planet);
+    var vines = ['M-30 120 C 90 30, 150 230, 250 160 S 390 60, 440 190', 'M-30 520 C 80 610, 170 430, 270 520 S 390 650, 440 560', 'M440 330 C 340 360, 310 270, 210 340 S 70 420, -30 340']
+      .map(function (d, k) {
+        var w = [24, 22, 14][k];
+        return '<g class="vine"><path d="' + d + '" fill="none" stroke="url(#chrome)" stroke-width="' + w + '" stroke-linecap="round"/>' +
+          '<path d="' + d + '" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="' + (w * 0.2) + '" stroke-linecap="round" transform="translate(-3 -4)"/>' +
+          '<path d="' + d + '" fill="none" stroke="#04210E" stroke-opacity=".45" stroke-width="' + (w * 0.25) + '" stroke-linecap="round" transform="translate(4 5)"/></g>';
+      }).join('');
+    var vdefs = '<defs><linearGradient id="chrome" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="' + Math.ceil(y) + '">' +
+      '<stop offset="0" stop-color="#0B3D1E"/><stop offset=".18" stop-color="#7CFF4F"/><stop offset=".3" stop-color="#EAFFD6"/><stop offset=".45" stop-color="#2FBF3A"/>' +
+      '<stop offset=".6" stop-color="#0A2E16"/><stop offset=".78" stop-color="#9DFF6A"/><stop offset="1" stop-color="#1F7A34"/></linearGradient>' +
+      '<filter id="warp" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".01 .02" numOctaves="2" seed="4" result="n">' +
+      '<animate attributeName="baseFrequency" values=".008 .018;.013 .028;.008 .018" dur="5s" repeatCount="indefinite"/></feTurbulence>' +
+      '<feDisplacementMap in="SourceGraphic" in2="n" scale="26"/></filter></defs>';
+    var box = el('div', { class: 'loader', id: 'loader', role: 'status', 'aria-label': 'Calculating your Navratri colour. ' + rows.join(' ') });
+    box.hidden = true;
+    var ghostSvg = '<svg class="loader-type ghost" viewBox="' + vb + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' + ghost + '</svg>';
+    box.innerHTML = '<div class="loader-halftone"></div>' + ghostSvg +
+      '<svg class="loader-type" viewBox="0 0 400 ' + Math.ceil(y) + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' + defs + out + badges + '</svg>' +
+      '<svg class="loader-vines" viewBox="0 0 400 ' + Math.ceil(y) + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + vdefs + '<g filter="url(#warp)">' + vines + '</g></svg>' + ghostSvg;
+    $('shell').appendChild(box);
+  }
+
   function startReveal() {
     var res = S.score(answers);   // always recomputed from stored answers
     lastResult = res;
     show('reveal');
-    $('revealCalc').hidden = false; $('revealLine').hidden = true;
+    $('revealLine').classList.remove('show');
+    var wrap = $('ringWrap'); wrap.style.visibility = 'hidden';
 
     var ring = $('ring'); ring.textContent = ''; ring.classList.remove('settled'); ring.style.transition = 'none'; ring.style.transform = 'rotate(0deg)';
-    var R = 84, cnt = D.colours.length;
+    var R = 102, cnt = D.colours.length;
     D.colours.forEach(function (c, i) {
       var a = i * 360 / cnt;
       var pos = 'rotate(' + a + 'deg) translateY(-' + R + 'px)';
@@ -141,21 +224,29 @@
       ring.appendChild(d);
     });
     var winAngle = res.index * 360 / cnt;
-    var spinMs = reduced ? 500 : 1500;
-    void ring.offsetWidth;
-    if (!reduced) {
-      ring.style.transition = 'transform 1.5s cubic-bezier(.15,.75,.2,1)';
-      ring.style.transform = 'rotate(' + (720 - winAngle) + 'deg)'; // winner lands at the top
-    } else {
-      ring.style.transform = 'rotate(' + (-winAngle) + 'deg)';
-    }
+
+    // 1. kinetic-type loader (about 2.5s), 2. wipe out to the colour ring, 3. name line, 4. result
+    var loader = $('loader');
+    loader.classList.remove('out', 'run'); loader.hidden = false; void loader.offsetWidth; loader.classList.add('run');
+    var LOAD = reduced ? 900 : 2500, SPIN = reduced ? 400 : 1200;
+    later(function () {
+      loader.classList.add('out');
+      wrap.style.visibility = 'visible';
+      void ring.offsetWidth;
+      if (!reduced) {
+        ring.style.transition = 'transform ' + SPIN + 'ms cubic-bezier(.15,.75,.2,1)';
+        ring.style.transform = 'rotate(' + (720 - winAngle) + 'deg)'; // winner lands at the top
+      } else {
+        ring.style.transform = 'rotate(' + (-winAngle) + 'deg)';
+      }
+    }, LOAD);
+    later(function () { loader.hidden = true; }, LOAD + 600);
     later(function () {
       ring.classList.add('settled');
-      $('revealCalc').hidden = true;
       $('revealName').textContent = res.colour.name.toUpperCase();
-      $('revealLine').hidden = false;
-    }, spinMs);
-    later(function () { showResult(res); }, spinMs + (reduced ? 900 : 1500));
+      $('revealLine').classList.add('show');
+    }, LOAD + SPIN + 100);
+    later(function () { showResult(res); }, LOAD + SPIN + (reduced ? 900 : 1300));
   }
 
   /* ---------- result ---------- */
@@ -174,14 +265,13 @@
     return s;
   }
   function outfit(c, who) {
-    var label = who === 'her' ? 'For her' : 'For him';
     var text = c[who];
     var frame = el('div', { class: 'frame' });
     frame.appendChild(el('div', { class: 'fallback' }, [silhouette(who)]));
-    var img = el('img', { src: 'images/' + c.key + '-' + who + '.jpg', alt: c.name + ' Navratri outfit ' + label.toLowerCase() + ': ' + text, loading: 'lazy', decoding: 'async' });
+    var img = el('img', { src: 'images/' + c.key + '-' + who + '.jpg', alt: c.name + ' Navratri outfit idea: ' + text, loading: 'lazy', decoding: 'async' });
     img.addEventListener('error', function () { img.remove(); }); // fallback stays visible
     frame.appendChild(img);
-    return el('figure', { class: 'outfit' }, [el('p', { class: 'outfit-label', text: label }), frame, el('figcaption', { text: text })]);
+    return el('figure', { class: 'outfit' }, [frame, el('figcaption', { text: text })]);
   }
   function chart(res) {
     var W = 300, P = 34, size = W - P * 2, RANGE = 2;
@@ -266,6 +356,7 @@
   /* ---------- boot ---------- */
   reset();
   initLanding();
+  buildLoader();
   $('startBtn').addEventListener('click', start);
   $('backBtn').addEventListener('click', back);
   $('shareBtn').addEventListener('click', share);
