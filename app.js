@@ -218,28 +218,19 @@
   }
 
   /* ---------- result ---------- */
-  function silhouette(kind) {
-    var s = svg('svg', { viewBox: '0 0 100 130', 'aria-hidden': 'true', fill: 'currentColor' });
-    if (kind === 'her') { // choli + flared ghagra
-      s.appendChild(svg('circle', { cx: 50, cy: 14, r: 10 }));
-      s.appendChild(svg('path', { d: 'M40 28 L60 28 L63 52 L37 52 Z' }));
-      s.appendChild(svg('path', { d: 'M37 52 L63 52 L96 126 Q50 134 4 126 Z' }));
-      s.appendChild(svg('path', { d: 'M61 30 Q86 52 82 92 L78 92 Q80 56 58 36 Z', opacity: '.55' })); // dupatta
-    } else { // kurta
-      s.appendChild(svg('circle', { cx: 50, cy: 14, r: 10 }));
-      s.appendChild(svg('path', { d: 'M36 28 L64 28 L84 36 L90 80 L80 82 L74 52 L72 100 L28 100 L26 52 L20 82 L10 80 L16 36 Z' }));
-      s.appendChild(svg('path', { d: 'M30 100 L48 100 L46 128 L32 128 Z M52 100 L70 100 L68 128 L54 128 Z', opacity: '.7' }));
-    }
-    return s;
-  }
-  function outfit(c, who) {
-    var text = c[who];
+  function moodboard(c) {
     var frame = el('div', { class: 'frame' });
-    frame.appendChild(el('div', { class: 'fallback' }, [silhouette(who)]));
-    var img = el('img', { src: 'images/' + c.key + '-' + who + '.jpg', alt: c.name + ' Navratri outfit idea: ' + text, loading: 'lazy', decoding: 'async' });
-    img.addEventListener('error', function () { img.remove(); }); // fallback stays visible
+    var img = el('img', { src: 'images/' + c.key + '.jpg', alt: c.name + ' Navratri moodboard: outfits, jewellery, flowers and festive details in ' + c.name.toLowerCase(), decoding: 'async' });
+    img.addEventListener('error', function () { img.remove(); }); // themed frame stays
     frame.appendChild(img);
-    return el('figure', { class: 'outfit' }, [frame, el('figcaption', { text: text })]);
+    return el('figure', { class: 'moodboard' }, [frame]);
+  }
+  function looks(c) {
+    var ul = el('ul', { class: 'looks' });
+    [['her', 'For her'], ['him', 'For him']].forEach(function (p) {
+      ul.appendChild(el('li', null, [el('b', { text: p[1] }), el('span', { text: c[p[0]] })]));
+    });
+    return ul;
   }
   function chart(res) {
     var W = 300, P = 34, size = W - P * 2, RANGE = 2;
@@ -292,7 +283,8 @@
     $('resHeadline').textContent = c.headline;
     $('resBlurb').textContent = c.blurb;
     var o = $('outfits'); o.textContent = '';
-    o.appendChild(outfit(c, 'her')); o.appendChild(outfit(c, 'him'));
+    o.appendChild(moodboard(c));
+    var lk = $('looks'); lk.textContent = ''; lk.appendChild(looks(c));
     chart(res);
     show('result', $('resName'));
   }

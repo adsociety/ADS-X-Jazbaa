@@ -18,7 +18,7 @@ Then point your QR code at the live URL.
 - `quiz-data.js` – all questions, scores, colour points, themes and copy. Edit here.
 - `scoring.js` – the pure scoring function, shared by the site and the check script.
 - `app.js`, `styles.css`, `index.html` – UI.
-- `images/` – 14 outfit photos (see `images/README.md`); placeholders show if missing.
+- `images/` – 7 colour moodboards, one per colour (see `images/README.md`); a themed placeholder shows if missing.
 - `scripts/check-distribution.js` – verifies the colour split.
 
 ## Editing questions and copy
