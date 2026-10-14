@@ -249,8 +249,6 @@ body[data-theme="black"] .panel-title { color: var(--r-btn); }
 @keyframes paper-float { from { transform: rotate(-2.5deg) translateY(0); } to { transform: rotate(-1.5deg) translateY(-8px); } }
 .looks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .looks li { display: grid; align-content: start; gap: 2px; font-size: .95rem; line-height: 1.35; }
-.looks b { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--r-dark); }
-body[data-theme="black"] .looks b { color: var(--r-btn); }
 
 .chart svg { display: block; width: 100%; max-width: 300px; margin: 0 auto; height: auto; }
 .chart text { font-family: var(--font-body); fill: var(--r-tint-ink); }
@@ -348,8 +346,6 @@ body[data-theme="black"] .looks b { color: var(--r-btn); }
     background: color-mix(in srgb, var(--r-on) 10%, transparent);
     border: 1px solid color-mix(in srgb, var(--r-on) 28%, transparent);
   }
-  .looks b { color: var(--r-on); opacity: .75; }
-  body[data-theme="black"] .looks b { color: var(--r-on); }
 
   .panel-chart { grid-area: chart; position: relative; padding: 36px 48px 40px; border-radius: 30px; margin-top: 12px; }
   .panel-chart::before { /* lehariya ribbon across the top of the card */

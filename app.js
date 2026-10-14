@@ -227,9 +227,7 @@
   }
   function looks(c) {
     var ul = el('ul', { class: 'looks' });
-    [['her', 'For her'], ['him', 'For him']].forEach(function (p) {
-      ul.appendChild(el('li', null, [el('b', { text: p[1] }), el('span', { text: c[p[0]] })]));
-    });
+    ['her', 'him'].forEach(function (k) { ul.appendChild(el('li', null, [el('span', { text: c[k] })])); });
     return ul;
   }
   function chart(res) {
