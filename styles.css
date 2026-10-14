@@ -211,23 +211,6 @@ body.themed .shell::before { color: color-mix(in srgb, var(--r-on) 11%, transpar
   .answers { gap: 10px; } .answer { min-height: 68px; flex-basis: 68px; }
 }
 
-/* ---------- Reveal ---------- */
-.reveal { align-items: center; justify-content: center; text-align: center; gap: 20px; }
-.ring-wrap { width: 250px; height: 250px; position: relative; }
-.ring { position: absolute; inset: 0; transition: transform 1.5s cubic-bezier(.15,.75,.2,1); }
-.ring .rdot {
-  position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px;
-  border-radius: 50%; box-shadow: 0 0 0 3px rgba(251,244,232,.55), 0 4px 10px rgba(0,0,0,.3);
-  transition: transform .5s var(--ease), opacity .5s;
-}
-.ring.settled .rdot { opacity: .2; }
-.ring.settled .rdot.win { opacity: 1; transform: var(--pos) scale(1.7); }
-.reveal-line { margin: 0 0 auto; font-family: var(--font-display); font-size: 1.6rem; color: var(--cream); opacity: 0; }
-.reveal-line.show { opacity: 1; animation: fadeUp .5s var(--ease); }
-.reveal .ring-wrap { margin-top: auto; }
-.reveal .brand { margin-top: 0; }
-.reveal-line strong { display: block; font-size: clamp(2.6rem, 14vw, 3.6rem); font-weight: 800; letter-spacing: .02em; color: var(--marigold); }
-
 /* ---------- Result ---------- */
 .result { color: var(--r-on); gap: 18px; padding-top: 34px; }
 .result-hero { text-align: left; }
@@ -316,7 +299,6 @@ body[data-theme="black"] .panel-title { color: var(--r-btn); }
   .progress { gap: 10px; }
   .quiz .brand { grid-column: 1 / -1; padding-top: 24px; }
 
-  .reveal .ring-wrap { width: 300px; height: 300px; transform: scale(1.35); margin-bottom: 40px; }
 
   /* result: a festive poster. Hero left, arched outfit "jharokha" frames right, chart band below */
   body[data-screen="result"] .shell { max-width: 1240px; }
@@ -387,7 +369,7 @@ body[data-theme="black"] .panel-title { color: var(--r-btn); }
 }
 
 /* ---------- Loading screen: kinetic type over halftone, with liquid chrome vines ---------- */
-.loader { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; overflow: hidden; background: #1B261A;
+.loader { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; overflow: hidden; background: #1B261A;
   clip-path: circle(150% at 50% 100%); transition: clip-path .55s cubic-bezier(.7, 0, .3, 1); }
 .loader.out { clip-path: circle(0% at 50% 100%); }
 .loader-halftone { position: absolute; inset: 0; pointer-events: none;
@@ -426,7 +408,7 @@ body[data-theme="black"] .panel-title { color: var(--r-btn); }
 /* ---------- Reduced motion: simple fades only ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .screen, .reveal-line { animation: fadeOnly .3s linear !important; }
+  .screen { animation: fadeOnly .3s linear !important; }
   .slide-in { animation: fadeOnly .2s linear !important; }
   .answer:hover, .answer:active, .btn:active { transform: none; }
   @keyframes fadeOnly { from { opacity: 0; } to { opacity: 1; } }

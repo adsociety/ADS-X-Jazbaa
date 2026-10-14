@@ -20,7 +20,7 @@
       // while empty, a round placeholder badge is shown instead.
       societies: [
         { name: 'Ashoka Data Society', short: 'ADS', logo: 'images/ADSlogo.jpg' },
-        { name: 'Jazbaa', short: 'J', logo: '' },
+        { name: 'Jazbaa', short: 'J', logo: 'images/jazbaa-logo.jpg' },
       ],
       // big stacked type on the loading screen (one entry per row)
       loaderRows: ['ASHOKA', 'DATA', 'SOCIETY', 'X', 'JAZBAA'],

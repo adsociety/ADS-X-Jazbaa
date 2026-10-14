@@ -30,7 +30,7 @@
     revealTimers.forEach(clearTimeout); revealTimers = [];
   }
   function show(name, focusEl) {
-    ['landing', 'quiz', 'reveal', 'result'].forEach(function (s) { $(s).hidden = s !== name; });
+    ['landing', 'quiz', 'result'].forEach(function (s) { $(s).hidden = s !== name; });
     document.body.dataset.screen = name;
     window.scrollTo(0, 0);
     if (focusEl) focusEl.focus({ preventScroll: true });
@@ -202,51 +202,19 @@
     box.innerHTML = '<div class="loader-halftone"></div>' + ghostSvg +
       '<svg class="loader-type" viewBox="0 0 400 ' + Math.ceil(y) + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' + defs + out + badges + '</svg>' +
       '<svg class="loader-vines" viewBox="0 0 400 ' + Math.ceil(y) + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + vdefs + '<g filter="url(#warp)">' + vines + '</g></svg>' + ghostSvg;
-    $('shell').appendChild(box);
+    document.body.appendChild(box);
   }
 
   function startReveal() {
     var res = S.score(answers);   // always recomputed from stored answers
     lastResult = res;
-    show('reveal');
-    $('revealLine').classList.remove('show');
-    var wrap = $('ringWrap'); wrap.style.visibility = 'hidden';
-
-    var ring = $('ring'); ring.textContent = ''; ring.classList.remove('settled'); ring.style.transition = 'none'; ring.style.transform = 'rotate(0deg)';
-    var R = 102, cnt = D.colours.length;
-    D.colours.forEach(function (c, i) {
-      var a = i * 360 / cnt;
-      var pos = 'rotate(' + a + 'deg) translateY(-' + R + 'px)';
-      var d = el('span', { class: 'rdot' + (i === res.index ? ' win' : '') });
-      d.style.background = c.theme.swatch;
-      d.style.transform = pos;
-      d.style.setProperty('--pos', pos);
-      ring.appendChild(d);
-    });
-    var winAngle = res.index * 360 / cnt;
-
-    // 1. kinetic-type loader (about 2.5s), 2. wipe out to the colour ring, 3. name line, 4. result
+    // render the result underneath, cover it with the kinetic-type loader, then wipe the loader away
+    showResult(res);
     var loader = $('loader');
     loader.classList.remove('out', 'run'); loader.hidden = false; void loader.offsetWidth; loader.classList.add('run');
-    var LOAD = reduced ? 900 : 2500, SPIN = reduced ? 400 : 1200;
-    later(function () {
-      loader.classList.add('out');
-      wrap.style.visibility = 'visible';
-      void ring.offsetWidth;
-      if (!reduced) {
-        ring.style.transition = 'transform ' + SPIN + 'ms cubic-bezier(.15,.75,.2,1)';
-        ring.style.transform = 'rotate(' + (720 - winAngle) + 'deg)'; // winner lands at the top
-      } else {
-        ring.style.transform = 'rotate(' + (-winAngle) + 'deg)';
-      }
-    }, LOAD);
-    later(function () { loader.hidden = true; }, LOAD + 600);
-    later(function () {
-      ring.classList.add('settled');
-      $('revealName').textContent = res.colour.name.toUpperCase();
-      $('revealLine').classList.add('show');
-    }, LOAD + SPIN + 100);
-    later(function () { showResult(res); }, LOAD + SPIN + (reduced ? 900 : 1300));
+    var LOAD = reduced ? 900 : 2500;
+    later(function () { loader.classList.add('out'); }, LOAD);
+    later(function () { loader.hidden = true; window.scrollTo(0, 0); }, LOAD + 600);
   }
 
   /* ---------- result ---------- */
